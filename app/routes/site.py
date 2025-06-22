@@ -2,6 +2,7 @@ from flask_restx import Namespace, Resource, fields
 from flask import request
 from app.database import db
 from app.models.site import Site
+from app.models.user import User
 
 api = Namespace('sites', description='Site operations')
 
@@ -19,3 +20,18 @@ class SiteList(Resource):
         db.session.add(site)
         db.session.commit()
         return {'message': 'Site created', 'id': site.id}, 201
+
+@api.route('/<int:site_id>/subjects')
+class SiteSubjects(Resource):
+    def get(self, site_id):
+        subjects = User.query.filter_by(site_id=site_id, role='subject').all()
+        if not subjects:
+            return {"message": "No subjects found for this site."}, 404
+        return [
+            {
+                "id": s.id,
+                "name": s.name,
+                "role": s.role
+            }
+            for s in subjects
+        ]
