@@ -26,3 +26,21 @@ class SubjectDataUpload(Resource):
         db.session.add(sd)
         db.session.commit()
         return {'message': 'Data uploaded', 'id': sd.id}, 201
+
+@api.route('/site/<int:site_id>')
+class SiteSubjectData(Resource):
+    def get(self, site_id):
+        data = SubjectData.query.filter_by(site_id=site_id).all()
+
+        if not data:
+            return {"message": "No subject data found for this site."}, 404
+
+        return [
+            {
+                "id": entry.id,
+                "subject_name": entry.subject_name,
+                "data": entry.data,
+                "timestamp": entry.timestamp.isoformat()
+            }
+            for entry in data
+        ]
