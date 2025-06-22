@@ -1,0 +1,6 @@
+Flask
+Flask-RESTX
+Flask-SQLAlchemy
+psycopg2-binary
+python-dotenv
+werkzeug==2.3.3
