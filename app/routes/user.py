@@ -20,3 +20,15 @@ class UserList(Resource):
         db.session.add(user)
         db.session.commit()
         return {'message': 'User created', 'id': user.id}, 201
+
+    def get(self):
+        users = User.query.all()
+        return [
+            {
+                "id": user.id,
+                "name": user.name,
+                "role": user.role,
+                "site_id": user.site_id
+            }
+            for user in users
+        ]

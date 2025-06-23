@@ -21,6 +21,17 @@ class StudyList(Resource):
         db.session.commit()
         return {'message': 'Study created', 'id': study.id}, 201
 
+    def get(self):
+        studies = Study.query.all()
+        return [
+            {
+                "id": study.id,
+                "name": study.name
+            }
+            for study in studies
+        ]
+
+
 @api.route('/<int:study_id>/subjects')
 class StudySubjects(Resource):
     def get(self, study_id):

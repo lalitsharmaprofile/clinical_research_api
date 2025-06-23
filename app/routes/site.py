@@ -21,6 +21,18 @@ class SiteList(Resource):
         db.session.commit()
         return {'message': 'Site created', 'id': site.id}, 201
 
+    def get(self):
+        sites = Site.query.all()
+        return [
+            {
+                "id": site.id,
+                "name": site.name,
+                "study_id": site.study_id
+            }
+            for site in sites
+        ]
+
+
 @api.route('/<int:site_id>/subjects')
 class SiteSubjects(Resource):
     def get(self, site_id):

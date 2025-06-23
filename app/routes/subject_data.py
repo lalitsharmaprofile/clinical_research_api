@@ -27,6 +27,21 @@ class SubjectDataUpload(Resource):
         db.session.commit()
         return {'message': 'Data uploaded', 'id': sd.id}, 201
 
+    def get(self):
+        data_entries = SubjectData.query.all()
+        return [
+            {
+                "id": data.id,
+                "subject_name": data.subject_name,
+                "data": data.data,
+                "timestamp": data.timestamp.isoformat(),
+                "site_id": data.site_id,
+                "user_id": data.user_id
+            }
+            for data in data_entries
+        ]
+
+
 @api.route('/site/<int:site_id>')
 class SiteSubjectData(Resource):
     def get(self, site_id):
