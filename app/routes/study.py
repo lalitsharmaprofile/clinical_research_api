@@ -4,6 +4,7 @@ from app.database import db
 from app.models.study import Study
 from app.models.site import Site
 from app.models.user import User
+from flask_jwt_extended import jwt_required, get_jwt
 
 api = Namespace('studies', description='Study operations')
 
@@ -14,8 +15,15 @@ study_model = api.model('Study', {
 @api.route('/')
 class StudyList(Resource):
     @api.expect(study_model)
+    @jwt_required()
     def post(self):
         data = request.get_json()
+
+        claims = get_jwt()
+        role = claims.get('role')
+        if role != 'admin':
+            return {"message": "Admins only"}, 403
+
         study = Study(name=data['name'])
         db.session.add(study)
         db.session.commit()

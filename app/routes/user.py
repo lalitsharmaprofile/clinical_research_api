@@ -2,6 +2,7 @@ from flask_restx import Namespace, Resource, fields
 from flask import request
 from app.database import db
 from app.models.user import User
+from app.utils.helpers import generate_unique_username
 
 api = Namespace('users', description='User operations')
 
@@ -15,11 +16,23 @@ user_model = api.model('User', {
 class UserList(Resource):
     @api.expect(user_model)
     def post(self):
-        data = request.get_json()
-        user = User(name=data['name'], role=data['role'], site_id=data.get('site_id'))
+        data = api.payload
+        username = generate_unique_username()
+
+        user = User(
+            name=data['name'],
+            role=data['role'],
+            site_id=data.get('site_id'),
+            username=username
+        )
+        user.set_password(data['password'])
         db.session.add(user)
         db.session.commit()
-        return {'message': 'User created', 'id': user.id}, 201
+
+        return {
+            "message": "User created",
+            "username": user.username
+        }, 201
 
     def get(self):
         users = User.query.all()

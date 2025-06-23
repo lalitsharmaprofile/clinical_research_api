@@ -3,6 +3,7 @@ from flask import request
 from app.database import db
 from app.models.site import Site
 from app.models.user import User
+from flask_jwt_extended import jwt_required, get_jwt
 
 api = Namespace('sites', description='Site operations')
 
@@ -14,8 +15,15 @@ site_model = api.model('Site', {
 @api.route('/')
 class SiteList(Resource):
     @api.expect(site_model)
+    @jwt_required()
     def post(self):
         data = request.get_json()
+        
+        claims = get_jwt()
+        role = claims.get('role')
+        if role != 'admin':
+            return {"message": "Admins only"}, 403
+
         site = Site(name=data['name'], study_id=data['study_id'])
         db.session.add(site)
         db.session.commit()
